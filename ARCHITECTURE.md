@@ -85,7 +85,7 @@ Why workspace-level (not tenant-level):
 2. Derive `tenant_id` from email local part (slug-safe)
 3. Upsert into Supabase `tenants` table (link `google_sub` on first login)
 4. Auto-create a "Default" workspace with `general` domain
-5. Create Qdrant collection `{tenant_id}_docs` with Voyage voyage-4-lite dimension (512)
+5. Create Qdrant collection `{tenant_id}_docs` with Voyage voyage-4 dimension (512)
 6. Issue signed JWT (`sub = tenant_id`, 30-day expiry)
 7. Redirect to `{FRONTEND_URL}/callback?token=<jwt>`
 
@@ -109,12 +109,12 @@ All embeddings are served by Voyage AI's REST API. No local model loading.
 
 | Domain | Voyage Model | Dim | Strength |
 |---|---|---|---|
-| general (default) | `voyage-4-lite` | 512 | Fast, strong general retrieval |
+| general (default) | `voyage-4` | 512 | Fast, strong general retrieval |
 | financial | `voyage-finance-2` | 1024 | Trained on financial corpora, SEC filings |
 | legal | `voyage-law-2` | 1024 | Trained on legal documents, case law |
-| medical | `voyage-4-lite` | 512 | General; medical domain uses clinical context |
-| clinical | `voyage-4-lite` | 512 | General + clinical note context |
-| scientific | `voyage-4-lite` | 512 | General + scientific paper context |
+| medical | `voyage-4` | 512 | General; medical domain uses clinical context |
+| clinical | `voyage-4` | 512 | General + clinical note context |
+| scientific | `voyage-4` | 512 | General + scientific paper context |
 | technical | `voyage-code-3` | 1024 | Trained on code, APIs, documentation |
 
 Why Voyage AI over local BERTs:
@@ -132,12 +132,12 @@ Single source of truth: `ingestion/model_registry.py`
 
 ```python
 MODEL_REGISTRY = {
-    "general":    {"model_id": "voyage-4-lite",    "dim": 512},
+    "general":    {"model_id": "voyage-4",    "dim": 512},
     "financial":  {"model_id": "voyage-finance-2", "dim": 1024},
     "legal":      {"model_id": "voyage-law-2",     "dim": 1024},
-    "medical":    {"model_id": "voyage-4-lite",    "dim": 512},
-    "clinical":   {"model_id": "voyage-4-lite",    "dim": 512},
-    "scientific": {"model_id": "voyage-4-lite",    "dim": 512},
+    "medical":    {"model_id": "voyage-4",    "dim": 512},
+    "clinical":   {"model_id": "voyage-4",    "dim": 512},
+    "scientific": {"model_id": "voyage-4",    "dim": 512},
     "technical":  {"model_id": "voyage-code-3",    "dim": 1024},
 }
 ```

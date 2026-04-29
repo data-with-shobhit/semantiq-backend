@@ -55,7 +55,7 @@ Supabase         Threshold gate (score < 0.65 → "I don't know")
 | **Auth** | Google OAuth 2.0 → JWT (tenant_id from `sub` claim) |
 | **LLM** | Groq `llama-3.3-70b-versatile` (primary), OpenRouter Gemma 4 (fallback) |
 | **HyDE** | Gemini 2.0 Flash (primary) → Groq fallback on rate limit |
-| **Embeddings** | Voyage AI — `voyage-4-lite` (general/scientific/medical/clinical), `voyage-finance-2` (financial), `voyage-law-2` (legal), `voyage-code-3` (technical) |
+| **Embeddings** | Voyage AI — `voyage-4` (general/scientific/medical/clinical), `voyage-finance-2` (financial), `voyage-law-2` (legal), `voyage-code-3` (technical) |
 | **Reranker** | Voyage AI `rerank-2.5` |
 | **Sparse retrieval** | SPLADE `naver/splade-v3` + BM25 fallback |
 | **Orchestration** | LangGraph ReAct (CRAG agent) |
@@ -91,12 +91,12 @@ Model selected at workspace creation, locked for the collection lifetime. Mixing
 
 | Domain | Voyage Model | Dim |
 |---|---|---|
-| general (default) | `voyage-4-lite` | 512 |
+| general (default) | `voyage-4` | 512 |
 | financial | `voyage-finance-2` | 1024 |
 | legal | `voyage-law-2` | 1024 |
-| medical | `voyage-4-lite` | 512 |
-| clinical | `voyage-4-lite` | 512 |
-| scientific | `voyage-4-lite` | 512 |
+| medical | `voyage-4` | 512 |
+| clinical | `voyage-4` | 512 |
+| scientific | `voyage-4` | 512 |
 | technical | `voyage-code-3` | 1024 |
 
 ---

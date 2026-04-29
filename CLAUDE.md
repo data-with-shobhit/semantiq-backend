@@ -35,7 +35,7 @@ See `ARCHITECTURE.md` for the full technical design and decision rationale.
 - No LangChain — direct libraries only
 
 **Embeddings — Voyage AI (API, no local models)**
-- `voyage-4-lite` — general, medical, clinical, scientific (512-dim)
+- `voyage-4` — general, medical, clinical, scientific (512-dim)
 - `voyage-finance-2` — financial (1024-dim)
 - `voyage-law-2` — legal (1024-dim)
 - `voyage-code-3` — technical (1024-dim)
@@ -93,12 +93,12 @@ Per-workspace domain selection. Model chosen at workspace creation, locked for t
 
 | Domain | Voyage Model | Dim |
 |---|---|---|
-| general (default) | `voyage-4-lite` | 512 |
+| general (default) | `voyage-4` | 512 |
 | financial | `voyage-finance-2` | 1024 |
 | legal | `voyage-law-2` | 1024 |
-| medical | `voyage-4-lite` | 512 |
-| clinical | `voyage-4-lite` | 512 |
-| scientific | `voyage-4-lite` | 512 |
+| medical | `voyage-4` | 512 |
+| clinical | `voyage-4` | 512 |
+| scientific | `voyage-4` | 512 |
 | technical | `voyage-code-3` | 1024 |
 
 Rules:
@@ -225,7 +225,7 @@ CELERY_BROKER_URL             same as REDIS_URL
 QDRANT_HOST                   Qdrant Cloud host
 QDRANT_API_KEY                Qdrant Cloud API key
 VOYAGE_API_KEY                Voyage AI (embeddings + reranker)
-VOYAGE_EMBEDDING_MODEL        voyage-4-lite (default)
+VOYAGE_EMBEDDING_MODEL        voyage-4 (default)
 VOYAGE_RERANKER_MODEL         rerank-2.5
 GROQ_API_KEY                  primary LLM + RAGAS eval
 GROQ_API_KEY_2                secondary key for RAGAS rotation
