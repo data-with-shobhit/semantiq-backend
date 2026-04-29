@@ -12,10 +12,11 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
 
 # Pre-download SPLADE model at build time — avoids 60s cold start
+# prithivida/Splade_PP_en_v1 is public (no HF token needed)
 RUN python -c "\
 from transformers import AutoTokenizer, AutoModelForMaskedLM; \
-AutoTokenizer.from_pretrained('naver/splade-v3'); \
-AutoModelForMaskedLM.from_pretrained('naver/splade-v3')"
+AutoTokenizer.from_pretrained('prithivida/Splade_PP_en_v1'); \
+AutoModelForMaskedLM.from_pretrained('prithivida/Splade_PP_en_v1')"
 
 COPY . .
 
