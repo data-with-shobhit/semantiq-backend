@@ -162,6 +162,17 @@ def _call_gemini(prompt: str) -> str:
     return resp.text
 
 
+def _call_groq(prompt: str) -> str:
+    from groq import Groq
+    client = Groq(api_key=settings.groq_api_key)
+    resp = client.chat.completions.create(
+        model=settings.groq_generation_model,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
+    )
+    return resp.choices[0].message.content
+
+
 def _llm_analyze(
     text: str,
     domain: str,
@@ -184,8 +195,28 @@ def _llm_analyze(
         schema=json.dumps(_STRATEGY_SCHEMA, indent=2),
     )
 
+    raw: str | None = None
+    source_llm = "llm"
+
+    # Gemini primary → Groq fallback on any error
     try:
         raw = _call_gemini(prompt)
+    except Exception as gemini_exc:
+        log.warning("analyzer.gemini_failed", filename=filename, error=str(gemini_exc))
+        try:
+            raw = _call_groq(prompt)
+            source_llm = "llm_groq"
+        except Exception as groq_exc:
+            log.error("analyzer.groq_failed", filename=filename, error=str(groq_exc))
+
+    if raw is None:
+        return IngestionStrategy(
+            "sentence_splitter", 384, 64,
+            "Strategy auto-selected (LLM unavailable — using defaults)",
+            0.5, "heuristic",
+        )
+
+    try:
         raw = raw.strip()
         if raw.startswith("```"):
             raw = re.sub(r"^```\w*\n?", "", raw)
@@ -198,18 +229,23 @@ def _llm_analyze(
         chunk_size = max(128, min(1024, int(data.get("chunk_size", 384))))
         overlap = max(0, min(chunk_size // 2 - 1, int(data.get("overlap", 64))))
 
-        source = "llm_ragas" if ragas_feedback else "llm"
+        if ragas_feedback:
+            source_llm = "llm_ragas"
         return IngestionStrategy(
             chunker=chunker,
             chunk_size=chunk_size,
             overlap=overlap,
             reasoning=str(data.get("reasoning", "LLM-determined strategy")),
             confidence=float(data.get("confidence", 0.8)),
-            source=source,
+            source=source_llm,
         )
     except Exception as exc:
-        log.error("analyzer.llm_failed", filename=filename, error=str(exc))
-        return IngestionStrategy("sentence_splitter", 384, 64, f"LLM failed ({exc}) — fallback", 0.5, "heuristic")
+        log.error("analyzer.parse_failed", filename=filename, error=str(exc))
+        return IngestionStrategy(
+            "sentence_splitter", 384, 64,
+            "Strategy auto-selected (could not parse LLM response — using defaults)",
+            0.5, "heuristic",
+        )
 
 
 # ── Public entry point ────────────────────────────────────────────────────────
