@@ -1,9 +1,10 @@
 """Celery worker entrypoint for Cloud Run.
 
-Cloud Run requires an HTTP server on port 8080. This script starts a minimal
-health-check server in a background thread, then runs the Celery worker in
-the foreground.
+Cloud Run requires an HTTP server listening on PORT before the health check
+passes. HTTPServer binds the socket synchronously in __init__, so the port is
+open before Celery starts — no race condition.
 """
+import os
 import subprocess
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -19,11 +20,9 @@ class HealthHandler(BaseHTTPRequestHandler):
         pass
 
 
-def _serve():
-    HTTPServer(("0.0.0.0", 8080), HealthHandler).serve_forever()
-
-
-threading.Thread(target=_serve, daemon=True).start()
+port = int(os.environ.get("PORT", 8080))
+server = HTTPServer(("0.0.0.0", port), HealthHandler)  # binds socket immediately
+threading.Thread(target=server.serve_forever, daemon=True).start()
 
 subprocess.run([
     "celery", "-A", "ingestion.tasks", "worker",
