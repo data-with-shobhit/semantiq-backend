@@ -186,14 +186,11 @@ async def query_stream(
                 if kind == "on_chain_start" and name in ("decompose", "rewrite", "retrieve", "generate", "grade", "web_search"):
                     yield _sse({"type": "status", "node": name})
 
-                # Node completed — extract outputs
+                # Node completed — collect outputs (generate may fire multiple times in CRAG retry)
                 if kind == "on_chain_end" and name in ("decompose", "rewrite", "retrieve", "generate", "grade", "web_search"):
                     output = event.get("data", {}).get("output", {})
                     if name == "generate" and output.get("answer"):
-                        answer = output["answer"]
-                        # Stream answer in small chunks for UX
-                        for i in range(0, len(answer), 20):
-                            yield _sse({"type": "token", "data": answer[i:i + 20]})
+                        answer = output["answer"]  # always take latest, stream once after loop
                     if output.get("trace"):
                         trace = output["trace"]
                     if output.get("chunks"):
@@ -202,6 +199,11 @@ async def query_stream(
                         llm_calls = output["llm_calls"]
                     if output.get("tokens_used"):
                         tokens_used = output["tokens_used"]
+
+            # Stream final answer once after graph completes — prevents duplication on retries
+            if answer:
+                for i in range(0, len(answer), 20):
+                    yield _sse({"type": "token", "data": answer[i:i + 20]})
 
             latency_ms = round((time.perf_counter() - t0) * 1000)
             yield _sse({"type": "done", "trace": trace, "llm_calls": llm_calls, "latency_ms": latency_ms})
