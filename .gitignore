@@ -12,6 +12,8 @@ wheels/
 .env
 .env.*
 !.env.example
+.env.yaml
+!.env.yaml.example
 
 # Exclude specific files
 get_token.py
