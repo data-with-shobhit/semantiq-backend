@@ -1,0 +1,14 @@
+.env
+.env.*
+frontend/
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+logs/
+storage/docs/
+*.md
+demo/
+tests/
+.vscode/

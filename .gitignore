@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info/
+.venv/
+.python-version
+
+# Secrets — never commit
+.env
+.env.*
+
+# Exclude specific files
+get_token.py
+image.png
+
+# Exclude specific md files
+auth_layer.md
+deployment_ui.md
+model_docs.md
+ui.md
+
+# Exclude folders
+inspo/
+frontend/
+logs/
+storage/docs/
+data/
+docs/
+
+# JSON files at root
+*.json
+
+# Misc
+.vscode/
+.pytest_cache/
+.code-review-graph/
+.mcp.json
+uv.lock
+storage/_fastapi_repo
+.claude/memory/
